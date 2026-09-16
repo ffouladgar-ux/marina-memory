@@ -24,7 +24,8 @@ Four mechanisms, all deliberate:
 ## Install (5 minutes, one time)
 
 ```bash
-# 1. Get the folder (unzip, or: git clone <private repo url>)
+# 1. Get the folder
+git clone https://github.com/ffouladgar-ux/marina-memory.git
 cd marina-memory
 
 # 2. Install (uv is the reliable route)

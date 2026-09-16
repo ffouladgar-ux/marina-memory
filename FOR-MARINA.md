@@ -4,6 +4,25 @@ Ce dossier installe une **mémoire** que Claude garde entre les sessions. Vos
 notes restent des fichiers Markdown, sur votre ordinateur. Rien n'est envoyé
 sur Internet. Rien n'est payant à l'usage.
 
+## Première installation (une seule fois, ~5 minutes)
+
+```bash
+git clone https://github.com/ffouladgar-ux/marina-memory.git
+cd marina-memory
+./install.sh
+```
+
+Le script installe l'outil, crée votre mémoire dans `~/MemoryVault`, et
+configure Claude Desktop automatiquement.
+
+Ensuite : **quittez Claude complètement (Cmd+Q)** et rouvrez-le, puis demandez :
+*« lis mon index de mémoire »*.
+
+Si `git clone` demande un mot de passe, c'est que l'invitation GitHub n'est pas
+encore acceptée : vérifiez votre e-mail.
+
+Pour vérifier à tout moment : `mm doctor`.
+
 ## Pourquoi c'est moins cher à utiliser
 
 Le problème habituel : on colle un document entier dans la conversation, et il
