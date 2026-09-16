@@ -123,6 +123,35 @@ This matters for a journalist, so it is stated plainly:
 - Optional: commit `~/MemoryVault` to a **private** git repo for versioned
   backup. `.index/` is gitignored; the Markdown is the history.
 
+## Upgrade path: phone and claude.ai web (only if she needs it)
+
+Claude Desktop and Claude Code run the server **on her machine** over stdio.
+That covers laptop use and keeps everything local.
+
+If she later wants the same memory from the Claude mobile app or claude.ai in a
+browser, custom connectors are fetched from Anthropic's cloud, so the server
+needs a public HTTPS endpoint. The same code already supports it:
+
+```bash
+mm serve --http --port 8765          # streamable-http on http://127.0.0.1:8765/mcp
+```
+
+Put that behind an authenticated tunnel or a small VPS and register the URL as a
+custom connector in Claude. Nothing else changes: same vault, same tools, same
+Markdown files. Verified by `scripts/e2e_http.py`.
+
+Do this only when she actually needs it. It moves her data from "on her disk" to
+"reachable from the internet", which is a real decision for a journalist, not a
+default.
+
+## Verifying it works
+
+```bash
+python -m pytest tests/ -q        # 18 tests: routing, storage, ingest, budget, MCP
+python scripts/e2e_mcp.py         # real stdio handshake + tool calls (9 checks)
+python scripts/e2e_http.py 8791   # real streamable-http handshake (upgrade path)
+```
+
 ## Limits (honest)
 
 - Retrieval is lexical (FTS5 keyword/prefix matching), not semantic. It is very

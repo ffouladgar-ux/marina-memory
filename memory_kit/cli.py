@@ -115,9 +115,29 @@ def cmd_forget(args) -> int:
 
 
 def cmd_serve(args) -> int:
-    from .server import main as serve
+    from . import server as srv
 
-    serve()
+    srv.get_vault()  # fail fast and loudly before a client connects
+    if getattr(args, "http", False):
+        port = int(getattr(args, "port", 8765))
+        host = getattr(args, "host", "127.0.0.1")
+        print(f"marina-memory: streamable-http on http://{host}:{port}/mcp "
+              f"(vault: {srv.get_vault().root})", file=sys.stderr)
+        try:
+            # mcp >= 2: host/port are run() kwargs
+            srv.mcp.run(transport="streamable-http", host=host, port=port)
+        except TypeError:
+            # mcp 1.x: FastMCP reads host/port from its own settings object
+            settings = getattr(srv.mcp, "settings", None)
+            if settings is not None:
+                for key, val in (("port", port), ("host", host)):
+                    try:
+                        setattr(settings, key, val)
+                    except Exception:
+                        pass
+            srv.mcp.run(transport="streamable-http")
+    else:
+        srv.mcp.run(transport="stdio")
     return 0
 
 
@@ -246,7 +266,12 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("connect-claude", help="wire this vault into Claude Desktop").set_defaults(fn=cmd_connect_claude)
     sub.add_parser("doctor", help="verify the install").set_defaults(fn=cmd_doctor)
-    sub.add_parser("serve", help="run the MCP server (Claude calls this)").set_defaults(fn=cmd_serve)
+    sp = sub.add_parser("serve", help="run the MCP server (Claude calls this)")
+    sp.add_argument("--http", action="store_true",
+                    help="serve over streamable-http instead of stdio (phone / claude.ai web)")
+    sp.add_argument("--port", type=int, default=8765)
+    sp.add_argument("--host", default="127.0.0.1")
+    sp.set_defaults(fn=cmd_serve)
 
     args = p.parse_args(argv)
     return int(args.fn(args) or 0)
