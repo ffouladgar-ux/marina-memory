@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "marina-memory"
+version = "0.1.0"
+description = "Local-first Markdown memory for Claude, over MCP. Files are the truth; the index is disposable."
+requires-python = ">=3.10"
+dependencies = [
+  "mcp>=1.2",
+  "markitdown[pdf,docx,pptx,xlsx,outlook]>=0.1.7",
+]
+
+[project.optional-dependencies]
+# OCR (scanned PDFs / images) and audio transcription are opt-in because they
+# pull large native dependencies. `pip install "marina-memory[extras]"`
+extras = ["markitdown[all]>=0.1.7"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+mm = "memory_kit.cli:main"
+
+[tool.setuptools]
+packages = ["memory_kit"]
