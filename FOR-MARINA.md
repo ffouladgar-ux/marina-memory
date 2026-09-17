@@ -6,18 +6,25 @@ sur Internet. Rien n'est payant à l'usage.
 
 ## Première installation (une seule fois, ~3 minutes)
 
-**Le plus simple, sans taper de commandes :**
+**Sur Windows (le plus simple, sans taper de commandes) :**
 
-1. Téléchargez le dossier (bouton vert **Code** → **Download ZIP** sur GitHub), puis décompressez-le.
-2. **Clic droit sur « Install Marina Memory.command » → Ouvrir**, puis confirmez **Ouvrir**.
-   (Ce clic droit n'est nécessaire que la première fois.)
-3. Attendez 1 à 3 minutes. Une fenêtre affiche la progression.
-4. **Quittez Claude complètement (Cmd+Q)** et rouvrez-le.
+1. Téléchargez le dossier (bouton vert **Code** → **Download ZIP** sur GitHub),
+   puis décompressez-le.
+2. **Double-cliquez sur « Install Marina Memory.bat »**.
+3. Attendez 2 à 5 minutes. La fenêtre affiche la progression et reste ouverte à
+   la fin.
+4. **Quittez Claude complètement** : clic droit sur l'icône Claude près de
+   l'horloge (zone de notification), puis **Quit**. Fermer la fenêtre ne suffit
+   pas, la configuration ne serait pas rechargée.
 5. Copiez les instructions de `CLAUDE-INSTRUCTIONS.md` dans
    **Réglages → Profil → Instructions personnalisées** de Claude.
 
-Rien n'est à installer avant : le script récupère lui-même Python et son
-gestionnaire de paquets s'ils manquent.
+Rien n'est à installer avant : si `uv` manque, le script le récupère, et `uv`
+récupère Python lui-même. Sur un PC d'école ou d'entreprise où PowerShell est
+bloqué, le script affiche la commande à lancer manuellement au lieu d'échouer.
+
+**Sur Mac :** mêmes étapes avec « Install Marina Memory.command », mais
+**clic droit → Ouvrir** la première fois, et quittez Claude avec **Cmd+Q**.
 
 **Ou en ligne de commande :**
 

@@ -41,12 +41,29 @@ def resolve_vault() -> Path:
 
 
 def claude_desktop_config_path() -> Path:
-    """Best-effort location of Claude Desktop's MCP config on this OS."""
+    """Best-effort location of Claude Desktop's MCP config on this OS.
+
+    Keyed off sys.platform (not os.name) so the Windows branch is testable
+    by patching sys.platform on any machine.
+    """
     import sys
 
     if sys.platform == "darwin":
         return Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
-    if os.name == "nt":
+    if sys.platform == "win32":
+        # Claude Desktop on Windows stores its config under %APPDATA% (Roaming).
         appdata = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
         return Path(appdata) / "Claude" / "claude_desktop_config.json"
     return Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
+
+
+def quit_claude_hint() -> str:
+    """Platform-correct way to actually reload Claude Desktop's MCP config."""
+    import sys
+
+    if sys.platform == "win32":
+        return ("quit Claude Desktop completely: right-click its icon next to the "
+                "clock (system tray) and choose Quit, then reopen it")
+    if sys.platform == "darwin":
+        return "quit Claude Desktop completely (Cmd+Q), then reopen it"
+    return "quit Claude Desktop completely, then reopen it"

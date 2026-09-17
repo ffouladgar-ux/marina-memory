@@ -243,8 +243,63 @@ def test_open_doc_sections_are_bounded(vault: Vault, tmp_path: Path):
     assert "beta" in res["sections"][0]
 
 
+# ----------------------------------------------------------------- windows
+def test_claude_config_path_windows(monkeypatch, tmp_path):
+    """Windows is Marina's platform, so this path must be right."""
+    import sys as _sys
+
+    from memory_kit import config
+
+    monkeypatch.setattr(_sys, "platform", "win32")
+    monkeypatch.setenv("APPDATA", str(tmp_path / "Roaming"))
+    p = config.claude_desktop_config_path()
+    assert p.name == "claude_desktop_config.json"
+    assert "Claude" in p.parts
+    assert str(tmp_path) in str(p)
+    assert "system tray" in config.quit_claude_hint()
+
+
+def test_claude_config_path_macos(monkeypatch):
+    import sys as _sys
+
+    from memory_kit import config
+
+    monkeypatch.setattr(_sys, "platform", "darwin")
+    p = config.claude_desktop_config_path()
+    assert "Application Support" in p.parts
+    assert "Cmd+Q" in config.quit_claude_hint()
+
+
+def test_claude_config_path_windows_without_appdata(monkeypatch):
+    """A stripped environment must not crash the installer."""
+    import sys as _sys
+
+    from memory_kit import config
+
+    monkeypatch.setattr(_sys, "platform", "win32")
+    monkeypatch.delenv("APPDATA", raising=False)
+    p = config.claude_desktop_config_path()
+    assert p.name == "claude_desktop_config.json"
+
+
+def test_connect_claude_writes_windows_path(monkeypatch, tmp_path):
+    """End to end for the Windows branch: real JSON written to %APPDATA%."""
+    import json
+    import sys as _sys
+
+    monkeypatch.setattr(_sys, "platform", "win32")
+    monkeypatch.setenv("APPDATA", str(tmp_path / "Roaming"))
+    monkeypatch.setenv("MEMORY_KIT_VAULT", str(tmp_path / "vault"))
+    from memory_kit import cli
+
+    args = type("A", (), {"vault": str(tmp_path / "vault")})()
+    assert cli.cmd_connect_claude(args) == 0
+    cfg = json.loads((tmp_path / "Roaming" / "Claude" / "claude_desktop_config.json").read_text())
+    assert cfg["mcpServers"]["marina-memory"]["env"]["MEMORY_KIT_VAULT"] == str(tmp_path / "vault")
+
+
 # --------------------------------------------------------------------- server
-def test_mcp_tools_are_registered(monkeypatch, tmp_path: Path):
+def test_mcp_tools_are_registered(monkeypatch, tmp_path):
     monkeypatch.setenv("MEMORY_KIT_VAULT", str(tmp_path / "mv"))
     from memory_kit import server
 

@@ -23,21 +23,41 @@ Four mechanisms, all deliberate:
 
 ## Install: double-click (no typing)
 
+**Windows**
+
 1. Get the folder: GitHub page → green **Code** button → **Download ZIP**, then
-   unzip it. (Or Fadi sends you the folder. Or `git clone` if you like terminals.)
-2. **Right-click `Install Marina Memory.command` → Open**, then confirm **Open**
-   when macOS asks. This right-click is needed only the first time; after that a
-   plain double-click works.
-3. Wait 1 to 3 minutes. A window shows progress and ends with a summary.
-4. Quit Claude completely (**Cmd+Q**) and reopen it.
+   unzip it. (Or Fadi sends you the folder.)
+2. Double-click **`Install Marina Memory.bat`**.
+3. Wait 2 to 5 minutes. The window shows progress and stays open at the end.
+4. Quit Claude completely: right-click the Claude icon next to the clock
+   (system tray) and choose **Quit**. Closing the window is not enough, it will
+   not reload.
 5. Paste the instructions from `CLAUDE-INSTRUCTIONS.md` into Claude's
    **Settings → Profile → Custom Instructions**.
 
-Nothing needs to be installed beforehand: the installer fetches its own Python
-and its own dependency manager if they are missing.
+Nothing needs installing first. If `uv` is missing the installer fetches it,
+and `uv` fetches Python itself. On a work or school PC where PowerShell is
+blocked, the installer prints the one command to run manually instead of dying.
 
-Windows: use `Install Marina Memory.bat` instead. Best effort only, the macOS
-path is the one that has been verified end to end.
+**macOS**
+
+Same, using `Install Marina Memory.command`, but **right-click → Open** the
+first time (macOS asks you to confirm a downloaded script), and quit Claude with
+**Cmd+Q**.
+
+### Verification status of the installers
+
+Honest state, so nobody is surprised:
+
+- **macOS: verified end to end** on a simulated fresh Mac (empty home, no `uv`,
+  no Python, `PATH` restricted to system binaries). It bootstrapped, installed,
+  created the vault, wired Claude, and finished with `mm doctor` reporting
+  ready.
+- **Windows: not yet executed on a real Windows machine from our side.** It is
+  guarded by `python scripts/check_installers.py` (CRLF line endings, correct
+  steps, manual fallback present) and the Windows config path plus
+  `%APPDATA%` writing are covered by unit tests, but that is not the same as
+  running it on Windows. Report anything that fails and it gets fixed.
 
 ## Install: by hand (5 minutes)
 
@@ -159,9 +179,10 @@ default.
 ## Verifying it works
 
 ```bash
-python -m pytest tests/ -q        # 18 tests: routing, storage, ingest, budget, MCP
-python scripts/e2e_mcp.py         # real stdio handshake + tool calls (9 checks)
-python scripts/e2e_http.py 8791   # real streamable-http handshake (upgrade path)
+python -m pytest tests/ -q              # 30 tests: routing, storage, ingest, budget, MCP, Windows paths
+python scripts/e2e_mcp.py               # real stdio handshake + tool calls (9 checks)
+python scripts/e2e_http.py 8791         # real streamable-http handshake (upgrade path)
+python scripts/check_installers.py      # installer guards (CRLF, steps, fallbacks)
 ```
 
 ## Limits (honest)

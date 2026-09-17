@@ -8,8 +8,8 @@ import sys
 from pathlib import Path
 
 from . import __version__, ingest
-from .config import (claude_desktop_config_path, read_config, resolve_vault,
-                     write_config)
+from .config import (claude_desktop_config_path, quit_claude_hint, read_config,
+                     resolve_vault, write_config)
 from .store import Vault, est_tokens
 
 
@@ -165,7 +165,7 @@ def cmd_connect_claude(args) -> int:
     cfg_path.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
     print(f"Claude Desktop configured: {cfg_path}")
     print(json.dumps({"marina-memory": entry}, indent=2))
-    print("\nNow: quit Claude Desktop completely (Cmd+Q) and reopen it.")
+    print(f"\nNow: {quit_claude_hint()}.")
     print("Then ask: 'read my memory index'.")
     print("\nUsing Claude Code instead? Run:")
     print(f'  claude mcp add marina-memory --env MEMORY_KIT_VAULT="{vault}" '
