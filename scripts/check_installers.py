@@ -71,8 +71,10 @@ def main() -> int:
             "never upload",
         ]:
             check(f"CLAUDE.md mentions {token!r}", token.lower() in ctext.lower())
-        check("CLAUDE.md tells the agent to stop on auth failure",
-              "authentication" in ctext.lower())
+        check("CLAUDE.md states the repo is public",
+              "public" in ctext.lower())
+        check("CLAUDE.md forbids asking the user for a token",
+              "token" in ctext.lower())
 
     print("\nInstall Marina Memory.command")
     check_bash(ROOT / "Install Marina Memory.command", [
