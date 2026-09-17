@@ -27,10 +27,26 @@ def vault(tmp_path: Path) -> Vault:
         ("Mon propriétaire veut augmenter le loyer", "personal"),
         ("Doctor appointment for my migraine medication", "health"),
         ("hello", "inbox"),
+        # regression cases from the 2026-09-17 lexicon tuning pass: these all
+        # landed in inbox/ before, which is friction for a non-technical user.
+        ("Rate card: 90 euros per article, 250 for a feature", "business"),
+        ("Interview confirmed Thursday with the deputy mayor", "business"),
+        ("Thomas is a photographer, useful for event coverage", "people"),
+        ("Passport expires in 2028, no renewal needed yet", "personal"),
+        ("Travel: train to Marseille booked for the conference", "personal"),
+        ("Doctor Moreau is the GP, appointments two weeks out", "health"),
     ],
 )
 def test_router(text, expected):
     assert route(text)[0] == expected
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["Photographe disponible pour le portrait", "Mon passeport expire en 2028"],
+)
+def test_router_french_variants(text):
+    assert route(text)[0] in {"people", "personal"}
 
 
 def test_router_never_drops():
