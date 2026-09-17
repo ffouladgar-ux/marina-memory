@@ -33,8 +33,13 @@ git clone https://github.com/ffouladgar-ux/marina-memory.git
 cd marina-memory && ./install.sh
 ```
 
-Si `git clone` demande un mot de passe, l'invitation GitHub n'est pas encore
-acceptée : vérifiez votre e-mail.
+Le dépôt est public : aucun compte GitHub n'est nécessaire, rien à accepter par
+e-mail.
+
+### Vérifier que c'est bien installé
+
+Tapez `mm doctor` dans une invite de commandes : la dernière ligne doit dire
+`RESULT: ready`.
 
 Pour vérifier à tout moment : `mm doctor`.
 

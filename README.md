@@ -148,10 +148,12 @@ mm doctor                  # verify everything
 
 This matters for a journalist, so it is stated plainly:
 
+- The **code** is public; your **memory is not**. Nothing in the repository
+  contains or touches your notes.
 - No network calls at runtime. Conversion and search are local.
 - No API keys, no accounts, no telemetry, no analytics.
-- Her data never leaves her machine unless she puts the vault in a git repo
-  herself.
+- Your data never leaves your machine unless you put the vault in a git repo
+  yourself.
 - Optional: commit `~/MemoryVault` to a **private** git repo for versioned
   backup. `.index/` is gitignored; the Markdown is the history.
 

@@ -23,11 +23,10 @@ git clone https://github.com/ffouladgar-ux/marina-memory.git
 cd marina-memory
 ```
 
-The repository is **private**. If the clone fails with an authentication error,
-**stop and tell the user**: they must accept the GitHub collaborator invite, then
-authorize GitHub once (`gh auth login`, which opens a browser and shows a
-one-time code). Never try to work around authentication, and never ask the user
-to paste a token into the conversation.
+The repository is **public**, so the clone needs no account, no credentials and
+no prompting. Do not run `gh auth`, do not ask for a token, do not ask the user
+to paste anything. If the clone fails, that is a network problem rather than an
+auth problem: report the error verbatim and stop.
 
 **2. Run the installer, in agent mode.**
 
