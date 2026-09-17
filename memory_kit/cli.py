@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -141,8 +142,34 @@ def cmd_serve(args) -> int:
     return 0
 
 
+def _wire_claude_code(vault: Path) -> tuple[bool, str]:
+    """Register the server with Claude Code (`claude mcp add`), user scope.
+
+    Scope matters: the CLI defaults to `local`, which binds the server to the
+    current folder only, so memory would silently vanish everywhere else.
+    `-s user` makes it available in every session.
+    """
+    exe = shutil.which("claude")
+    if not exe:
+        return False, "the 'claude' command was not found on PATH"
+    try:
+        subprocess.run([exe, "mcp", "remove", "marina-memory", "-s", "user"],
+                       capture_output=True, text=True, timeout=120)
+        p = subprocess.run(
+            [exe, "mcp", "add", "marina-memory", "-s", "user",
+             "-e", f"MEMORY_KIT_VAULT={vault}",
+             "--", sys.executable, "-m", "memory_kit", "serve"],
+            capture_output=True, text=True, timeout=180,
+        )
+    except Exception as e:  # pragma: no cover
+        return False, f"{type(e).__name__}: {e}"
+    if p.returncode != 0:
+        return False, (p.stderr or p.stdout).strip()[:300]
+    return True, "marina-memory registered for user scope"
+
+
 def cmd_connect_claude(args) -> int:
-    """Wire the MCP server into Claude Desktop, with correct absolute paths."""
+    """Wire the MCP server into every Claude surface present on this machine."""
     vault = Path(args.vault).expanduser() if args.vault else resolve_vault()
     Vault(vault).ensure()
     cfg_path = claude_desktop_config_path()
@@ -157,19 +184,29 @@ def cmd_connect_claude(args) -> int:
         try:
             cfg = json.loads(cfg_path.read_text(encoding="utf-8")) or {}
         except Exception:
-            print(f"WARNING: {cfg_path} exists but is not valid JSON — it was backed up. "
+            print(f"WARNING: {cfg_path} exists but is not valid JSON, it was backed up. "
                   "Fix it, then re-run.", file=sys.stderr)
             return 1
     cfg.setdefault("mcpServers", {})["marina-memory"] = entry
     cfg_path.parent.mkdir(parents=True, exist_ok=True)
     cfg_path.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
-    print(f"Claude Desktop configured: {cfg_path}")
-    print(json.dumps({"marina-memory": entry}, indent=2))
+    desktop_ok = True
+    print(f"Claude Desktop / Cowork configured: {cfg_path}")
+
+    code_ok, code_detail = _wire_claude_code(vault)
+    if code_ok:
+        print(f"Claude Code configured: {code_detail}")
+    else:
+        print(f"Claude Code not wired: {code_detail}")
+        print("   If she uses Claude Code, install it first, or run this yourself:")
+        print(f'   claude mcp add marina-memory -s user -e MEMORY_KIT_VAULT="{vault}" '
+              f'-- "{sys.executable}" -m memory_kit serve')
+
     print(f"\nNow: {quit_claude_hint()}.")
     print("Then ask: 'read my memory index'.")
-    print("\nUsing Claude Code instead? Run:")
-    print(f'  claude mcp add marina-memory --env MEMORY_KIT_VAULT="{vault}" '
-          f'-- "{sys.executable}" -m memory_kit serve')
+    if getattr(args, "agent", False):
+        print(f"CONNECT_RESULT: desktop={'yes' if desktop_ok else 'no'} "
+              f"claude_code={'yes' if code_ok else 'no'} vault={vault}")
     return 0
 
 
@@ -264,7 +301,11 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("id")
     sp.set_defaults(fn=cmd_forget)
 
-    sub.add_parser("connect-claude", help="wire this vault into Claude Desktop").set_defaults(fn=cmd_connect_claude)
+    sp = sub.add_parser("connect-claude", aliases=["connect"],
+                        help="wire this vault into Claude Desktop/Cowork and Claude Code")
+    sp.add_argument("--agent", action="store_true",
+                    help="machine-readable output (used by coding agents)")
+    sp.set_defaults(fn=cmd_connect_claude)
     sub.add_parser("doctor", help="verify the install").set_defaults(fn=cmd_doctor)
     sp = sub.add_parser("serve", help="run the MCP server (Claude calls this)")
     sp.add_argument("--http", action="store_true",

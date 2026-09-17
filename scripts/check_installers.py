@@ -51,9 +51,28 @@ def main() -> int:
         "astral.sh/uv/install.sh",     # self-bootstrapping, no prerequisites
         "uv tool install",
         "mm init",
-        "mm connect-claude",
+        "mm connect",
         "mm doctor",
+        "--agent",                     # agents must be able to run it unattended
+        "INSTALL_RESULT: ok",
     ], "install.sh")
+
+    print("\nCLAUDE.md (the agent install contract)")
+    contract = ROOT / "CLAUDE.md"
+    check("CLAUDE.md exists", contract.exists())
+    if contract.exists():
+        ctext = contract.read_text(encoding="utf-8")
+        for token in [
+            "git clone",
+            "install.sh --agent",
+            "RESULT: ready",
+            "Cmd+Q",
+            "system tray",
+            "never upload",
+        ]:
+            check(f"CLAUDE.md mentions {token!r}", token.lower() in ctext.lower())
+        check("CLAUDE.md tells the agent to stop on auth failure",
+              "authentication" in ctext.lower())
 
     print("\nInstall Marina Memory.command")
     check_bash(ROOT / "Install Marina Memory.command", [
@@ -77,9 +96,12 @@ def main() -> int:
             "UV_TOOL_BIN_DIR",
             "uv tool install",
             "mm init",
-            "mm connect-claude",
+            "mm connect",
             "mm doctor",
-            "pause",                     # window must not vanish
+            "--agent",                   # agents run it unattended: no pause
+            "INSTALL_RESULT: ok",
+            "RESULT: ready",
+            "pause",                     # window must not vanish in human mode
             ":failed",
         ]:
             check(f".bat contains {token!r}", token in text)

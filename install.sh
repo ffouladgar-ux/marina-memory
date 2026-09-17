@@ -1,13 +1,28 @@
 #!/usr/bin/env bash
 # marina-memory installer. Safe to re-run. No prior tools required.
 #
-# Turns a fresh Mac into a working install with one step. If uv is missing it
-# installs it (uv can also fetch its own Python, so nothing else is needed).
+#   ./install.sh            human mode: friendly output, ends with a summary
+#   ./install.sh --agent    agent mode: non-interactive, machine-readable lines
+#
+# If uv is missing it is fetched over the network; uv then fetches its own
+# Python, so the only prerequisite is an internet connection.
 set -uo pipefail
 cd "$(dirname "$0")"
 
+AGENT=0
+for arg in "$@"; do
+  [ "$arg" = "--agent" ] && AGENT=1
+done
+
 say() { printf '%s\n' "$*"; }
-fail() { say ""; say "SETUP FAILED: $*"; say "Send the text above to Fadi."; exit 1; }
+say_agent() { [ "$AGENT" = "1" ] && printf '%s\n' "$*"; }
+fail() {
+  say ""
+  say "SETUP FAILED: $*"
+  say "Send the text above to Fadi."
+  say_agent "INSTALL_RESULT: failed"
+  exit 1
+}
 
 say "== Marina Memory: installer =="
 say ""
@@ -37,27 +52,36 @@ say ""
 say "-> Creating your memory vault (Plain Markdown files you own)"
 mm init || fail "could not create the vault"
 
-# ------------------------------------------------------------ 4. Claude wiring
+# ---------------------------------------------------------- 4. Claude wiring
 say ""
-say "-> Connecting it to Claude Desktop"
-mm connect-claude || fail "could not write the Claude Desktop config"
+say "-> Connecting it to your Claude apps"
+if [ "$AGENT" = "1" ]; then
+  mm connect --agent || fail "could not wire the Claude apps"
+else
+  mm connect || fail "could not wire the Claude apps"
+fi
 
 # ------------------------------------------------------------------ 5. verify
 say ""
 say "-> Verifying"
-if mm doctor | tail -20; then
+DOCTOR="$(mm doctor 2>&1)"
+printf '%s\n' "$DOCTOR"
+printf '%s' "$DOCTOR" | grep -q "RESULT: ready" || fail "the install ran but 'mm doctor' reported problems"
+
+say_agent "INSTALL_RESULT: ok"
+say_agent "VAULT: ${MEMORY_KIT_VAULT:-$HOME/MemoryVault}"
+
+if [ "$AGENT" != "1" ]; then
   say ""
   say "================================================================"
   say " Almost done. Two steps left, once:"
   say ""
-  say "   1. Quit Claude completely: press Cmd+Q (closing the window"
-  say "      is not enough, it will not reload)"
-  say "   2. Reopen Claude and paste the instructions from"
-  say "      CLAUDE-INSTRUCTIONS.md into Settings then Profile then"
+  say "   1. Quit Claude completely (Mac: Cmd+Q; Windows: right-click"
+  say "      the tray icon, then Quit). Closing the window is not enough."
+  say "   2. Reopen Claude, then paste the instructions from"
+  say "      CLAUDE-INSTRUCTIONS.md into Settings, Profile,"
   say "      Custom Instructions"
   say ""
   say " Then just talk to it normally."
   say "================================================================"
-else
-  fail "the install ran but 'mm doctor' reported problems"
 fi

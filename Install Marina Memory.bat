@@ -1,7 +1,12 @@
 @echo off
 setlocal EnableExtensions
 REM Double-click this file to install Marina Memory on Windows.
-REM It installs everything it needs, then keeps the window open so you can read the result.
+REM   Install Marina Memory.bat            human mode (keeps the window open)
+REM   Install Marina Memory.bat --agent    agent mode (no pause, result lines)
+REM It installs everything it needs, then reports what happened.
+
+set "AGENT=0"
+if "%~1"=="--agent" set "AGENT=1"
 
 cd /d "%~dp0" || goto :failed
 
@@ -54,13 +59,19 @@ mm init
 if errorlevel 1 goto :failed
 
 echo.
-echo -^> Connecting it to Claude Desktop...
-mm connect-claude
+echo -^> Connecting it to your Claude apps...
+if "%AGENT%"=="1" (
+  mm connect --agent
+) else (
+  mm connect
+)
 if errorlevel 1 goto :failed
 
 echo.
 echo -^> Verifying...
-mm doctor
+mm doctor > "%TEMP%\marina-memory-doctor.txt" 2>&1
+type "%TEMP%\marina-memory-doctor.txt"
+findstr /C:"RESULT: ready" "%TEMP%\marina-memory-doctor.txt" >nul
 if errorlevel 1 goto :failed
 
 echo.
@@ -76,6 +87,7 @@ echo      Custom Instructions.
 echo.
 echo  Then just talk to it normally.
 echo ================================================================
+if "%AGENT%"=="1" echo INSTALL_RESULT: ok
 goto :end
 
 :failed
@@ -86,7 +98,7 @@ echo.
 echo  Select the text in this window with the mouse, copy it, and
 echo  send it to Fadi. Nothing is broken and it is safe to re-run.
 echo ================================================================
+if "%AGENT%"=="1" echo INSTALL_RESULT: failed
 
 :end
-echo.
-pause
+if "%AGENT%"=="0" pause
