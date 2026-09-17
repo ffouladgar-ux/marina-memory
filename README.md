@@ -21,24 +21,35 @@ Four mechanisms, all deliberate:
 4. **No embeddings, no LLM calls.** Search is SQLite FTS5, locally. Storing a
    fact costs zero tokens, so memory can accumulate as much as she likes.
 
-## Install (5 minutes, one time)
+## Install: double-click (no typing)
+
+1. Get the folder: GitHub page → green **Code** button → **Download ZIP**, then
+   unzip it. (Or Fadi sends you the folder. Or `git clone` if you like terminals.)
+2. **Right-click `Install Marina Memory.command` → Open**, then confirm **Open**
+   when macOS asks. This right-click is needed only the first time; after that a
+   plain double-click works.
+3. Wait 1 to 3 minutes. A window shows progress and ends with a summary.
+4. Quit Claude completely (**Cmd+Q**) and reopen it.
+5. Paste the instructions from `CLAUDE-INSTRUCTIONS.md` into Claude's
+   **Settings → Profile → Custom Instructions**.
+
+Nothing needs to be installed beforehand: the installer fetches its own Python
+and its own dependency manager if they are missing.
+
+Windows: use `Install Marina Memory.bat` instead. Best effort only, the macOS
+path is the one that has been verified end to end.
+
+## Install: by hand (5 minutes)
 
 ```bash
 # 1. Get the folder
 git clone https://github.com/ffouladgar-ux/marina-memory.git
 cd marina-memory
 
-# 2. Install (uv is the reliable route)
-uv tool install --force .
-#    no uv?  ->  pipx install .   or   pip install --user .
+# 2. Everything at once (installer, vault, Claude wiring, verification)
+./install.sh
 
-# 3. Create her vault
-mm init
-
-# 4. Wire it into Claude Desktop
-mm connect-claude
-
-# 5. Quit Claude Desktop completely (Cmd+Q) and reopen it.
+# 3. Quit Claude Desktop completely (Cmd+Q) and reopen it.
 #    Ask Claude: "read my memory index"
 ```
 
