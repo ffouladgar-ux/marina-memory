@@ -31,9 +31,9 @@ Four mechanisms, all deliberate:
 3. Wait 2 to 5 minutes. The window shows progress and stays open at the end.
 4. Quit Claude completely: right-click the Claude icon next to the clock
    (system tray) and choose **Quit**. Closing the window is not enough, it will
-   not reload.
-5. Paste the instructions from `CLAUDE-INSTRUCTIONS.md` into Claude's
-   **Settings → Profile → Custom Instructions**.
+   not reload. Reopen it, and the memory is on.
+   (Nothing to paste: the server installs its own instructions into Claude
+   during the handshake. `CLAUDE-INSTRUCTIONS.md` is optional insurance.)
 
 Nothing needs installing first. If `uv` is missing the installer fetches it,
 and `uv` fetches Python itself. On a work or school PC where PowerShell is

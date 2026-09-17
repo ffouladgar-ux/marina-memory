@@ -15,9 +15,9 @@ sur Internet. Rien n'est payant à l'usage.
    la fin.
 4. **Quittez Claude complètement** : clic droit sur l'icône Claude près de
    l'horloge (zone de notification), puis **Quit**. Fermer la fenêtre ne suffit
-   pas, la configuration ne serait pas rechargée.
-5. Copiez les instructions de `CLAUDE-INSTRUCTIONS.md` dans
-   **Réglages → Profil → Instructions personnalisées** de Claude.
+   pas, la configuration ne serait pas rechargée. Rouvrez-le : la mémoire est
+   active. Rien à copier-coller, rien à configurer : le serveur installe ses
+   propres instructions dans Claude automatiquement.
 
 Rien n'est à installer avant : si `uv` manque, le script le récupère, et `uv`
 récupère Python lui-même. Sur un PC d'école ou d'entreprise où PowerShell est

@@ -76,14 +76,13 @@ if errorlevel 1 goto :failed
 
 echo.
 echo ================================================================
-echo  Almost done. Two steps left, once:
+echo  Almost done. One step left, once:
 echo.
-echo   1. Quit Claude completely: right-click the Claude icon next to
-echo      the clock ^(system tray^) and choose Quit. Closing the window
-echo      is not enough, it will not reload.
-echo   2. Reopen Claude, then paste the instructions from
-echo      CLAUDE-INSTRUCTIONS.md into Settings, Profile,
-echo      Custom Instructions.
+echo   Quit Claude completely: right-click the Claude icon next to the
+echo   clock ^(system tray^) and choose Quit, then reopen it. Closing
+echo   the window is not enough, it will not reload.
+echo.
+echo   That's it. Nothing to paste, nothing to configure.
 echo.
 echo  Then just talk to it normally.
 echo ================================================================

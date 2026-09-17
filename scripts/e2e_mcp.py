@@ -36,6 +36,12 @@ async def main(vault: Path) -> int:
             info = getattr(init, "server_info", None) or getattr(init, "serverInfo", None)
             print(f"handshake: {info.name} v{info.version}")
 
+            # Server-level instructions are how the kit teaches Claude to use
+            # memory without the user pasting anything into Custom Instructions.
+            instr = getattr(init, "instructions", None)
+            check("server instructions reach the client", bool(instr) and "memory_recall" in instr,
+                  f"{len(instr)} chars" if instr else "NONE")
+
             tools = await session.list_tools()
             names = sorted(t.name for t in tools.tools)
             print(f"tools ({len(names)}): {', '.join(names)}")

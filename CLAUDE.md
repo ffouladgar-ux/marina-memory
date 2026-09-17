@@ -52,15 +52,17 @@ mm doctor
 It must end with `RESULT: ready`. Anything else: report the raw output verbatim
 and stop.
 
-**4. Tell the user the two remaining manual actions.** They are not optional and
-you cannot do them for them:
+**4. Tell the user the one remaining manual action.** You cannot do it for them:
 
 - Quit Claude completely and reopen it. macOS: `Cmd+Q`. Windows: right-click the
   Claude icon next to the clock (system tray) and choose Quit. Closing the window
   does not reload the MCP config.
-- Paste the block under "Text to paste" in `CLAUDE-INSTRUCTIONS.md` into Claude's
-  **Settings → Profile → Custom Instructions**. Without it the tools exist but
-  Claude will not reliably use them.
+
+That is the only required step. The server sends its own operating instructions
+to Claude over MCP during the handshake (verified: 1,211 characters in the
+initialize response), so **nothing needs to be pasted into Custom Instructions**.
+Mention `CLAUDE-INSTRUCTIONS.md` only as optional insurance if the user later
+finds Claude ignoring memory.
 
 **5. Confirm it works end to end.** After the user restarts Claude, ask them to
 say *"read my memory index"*. Expected: Claude calls `memory_index` and describes

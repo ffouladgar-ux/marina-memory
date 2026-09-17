@@ -299,6 +299,17 @@ def test_connect_claude_writes_windows_path(monkeypatch, tmp_path):
 
 
 # --------------------------------------------------------------------- server
+def test_server_sends_operating_instructions():
+    """The kit teaches Claude how to use memory over MCP itself, so the user
+    does not have to paste anything into Custom Instructions."""
+    from memory_kit import server
+
+    assert isinstance(server.INSTRUCTIONS, str)
+    assert len(server.INSTRUCTIONS) > 500
+    for token in ["memory_recall", "memory_remember", "memory_ingest", "memory_index"]:
+        assert token in server.INSTRUCTIONS
+
+
 def test_mcp_tools_are_registered(monkeypatch, tmp_path):
     monkeypatch.setenv("MEMORY_KIT_VAULT", str(tmp_path / "mv"))
     from memory_kit import server

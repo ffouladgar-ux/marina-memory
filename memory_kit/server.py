@@ -25,6 +25,40 @@ from .store import Vault, est_tokens
 mcp = _Server("marina-memory")
 _vault: Vault | None = None
 
+# MCP carries server-level instructions in the initialize response, and hosts
+# are expected to give them to the model. This is what makes the kit work out of
+# the box, without the user pasting anything into Claude's Custom Instructions.
+# (CLAUDE-INSTRUCTIONS.md still exists as belt and braces.)
+INSTRUCTIONS = """\
+This user has persistent memory stored as Markdown files on this machine, \
+available through the tools prefixed `memory_`.
+
+- Before asking about their work, study, contacts, admin, health or past
+  decisions, call `memory_recall` with a few search words first. Never ask them
+  to repeat something that is already stored.
+- When they state a durable fact, decision, preference, deadline, contact or
+  amount, call `memory_remember` immediately, in one self-contained sentence,
+  without asking permission. One fact per call. Pass a compartment only when you
+  are certain; otherwise let it self-file.
+- When they give you a document (PDF, DOCX, PPTX, XLSX, HTML, EPUB, image),
+  never ask them to paste its contents. Call `memory_ingest` with the file path,
+  then read it back in sections with `memory_open` and a query.
+- At the start of a session that needs their context, call `memory_index` once
+  instead of asking them for a summary of who they are or what they are working on.
+- Keep context small: prefer `memory_recall` and section reads over pulling whole
+  documents into the conversation. If something stored looks wrong or obsolete,
+  say so and use `memory_forget` rather than working around it.
+"""
+
+try:  # the instructions kwarg exists on both SDK majors, but be tolerant
+    mcp = _Server("marina-memory", instructions=INSTRUCTIONS)
+except TypeError:  # pragma: no cover
+    mcp = _Server("marina-memory")
+    try:
+        mcp.instructions = INSTRUCTIONS
+    except Exception:
+        pass
+
 
 def tool_names() -> list[str]:
     """Tool names actually registered on the server (works on both SDK majors)."""

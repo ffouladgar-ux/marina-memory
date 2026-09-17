@@ -1,12 +1,12 @@
-# The instructions that make Claude actually use the memory
+# The instructions that make Claude use the memory
 
-Installing the server is only half of it. Claude has the tools, but it has to
-*choose* to call them. Left alone it will happily ask her to re-explain things
-she already stored.
-
-Paste the text below into **Claude → Settings → Profile → Custom Instructions**
-(and into any Project she uses). It is the difference between memory that gets
-used and memory that just sits on disk.
+> **You probably do not need this file.**
+> The server now sends these same instructions to Claude automatically over MCP,
+> during the handshake (verified: 1,211 characters in the initialize response).
+> Nothing has to be pasted anywhere for the memory to be used.
+>
+> Keep this as insurance. Use it if Claude ever ignores memory, or if you would
+> rather the instructions live in Claude's own settings than in the server.
 
 ---
 
